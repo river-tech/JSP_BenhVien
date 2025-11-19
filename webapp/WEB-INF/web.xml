@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <display-name>BenhVien Vaccine Manager</display-name>
+
+    <servlet>
+        <servlet-name>VaccineSearchServlet</servlet-name>
+        <servlet-class>controller.VaccineSearchServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VaccineSearchServlet</servlet-name>
+        <url-pattern>/vaccines/search</url-pattern>
+        <url-pattern>/vaccines</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VaccineCreateServlet</servlet-name>
+        <servlet-class>controller.VaccineCreateServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VaccineCreateServlet</servlet-name>
+        <url-pattern>/vaccines/create</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VaccineEditServlet</servlet-name>
+        <servlet-class>controller.VaccineEditServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VaccineEditServlet</servlet-name>
+        <url-pattern>/vaccines/edit</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VaccineDeleteServlet</servlet-name>
+        <servlet-class>controller.VaccineDeleteServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VaccineDeleteServlet</servlet-name>
+        <url-pattern>/vaccines/delete</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LichSuTiemServlet</servlet-name>
+        <servlet-class>controller.LichSuTiemServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LichSuTiemServlet</servlet-name>
+        <url-pattern>/history</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ThongKeServlet</servlet-name>
+        <servlet-class>controller.ThongKeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ThongKeServlet</servlet-name>
+        <url-pattern>/statistics</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+</web-app>
