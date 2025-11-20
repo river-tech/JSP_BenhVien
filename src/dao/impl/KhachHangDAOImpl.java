@@ -51,13 +51,26 @@ public class KhachHangDAOImpl implements KhachHangDAO {
 
     @Override
     public boolean insert(KhachHang khachHang) {
+        // Kiểm tra xem có cột Username/Password không, nếu không thì chỉ insert các trường cơ bản
         String sql = "INSERT INTO KHACHHANG(MaKH, HoTenKH, SoDienThoai, DiaChiKH, NgaySinh, GioiTinh) VALUES(?,?,?,?,?,?)";
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            fillStatement(khachHang, ps);
+            ps.setString(1, khachHang.getMaKH());
+            ps.setString(2, khachHang.getHoTenKH());
+            ps.setString(3, khachHang.getSoDienThoai());
+            ps.setString(4, khachHang.getDiaChiKH());
+            if (khachHang.getNgaySinh() != null) {
+                ps.setDate(5, Date.valueOf(khachHang.getNgaySinh()));
+            } else {
+                ps.setNull(5, java.sql.Types.DATE);
+            }
+            ps.setString(6, khachHang.getGioiTinh());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            // Log lỗi chi tiết để debug
+            System.err.println("Lỗi khi insert khách hàng: " + e.getMessage());
+            System.err.println("SQL State: " + e.getSQLState());
         }
         return false;
     }
@@ -91,6 +104,39 @@ public class KhachHangDAOImpl implements KhachHangDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maKH);
             return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public Optional<KhachHang> findByUsername(String username) {
+        String sql = "SELECT MaKH, HoTenKH, SoDienThoai, DiaChiKH, NgaySinh, GioiTinh, Username, Password FROM KHACHHANG WHERE Username=?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return Optional.of(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean validatePassword(String username, String password) {
+        String sql = "SELECT Password FROM KHACHHANG WHERE Username = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String storedPassword = rs.getString("Password");
+                return storedPassword != null && storedPassword.equals(password);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -136,16 +182,9 @@ public class KhachHangDAOImpl implements KhachHangDAO {
         );
     }
 
+    // Method này không còn được sử dụng, đã thay bằng code trực tiếp trong insert()
+    @Deprecated
     private void fillStatement(KhachHang khachHang, PreparedStatement ps) throws SQLException {
-        ps.setString(1, khachHang.getMaKH());
-        ps.setString(2, khachHang.getHoTenKH());
-        ps.setString(3, khachHang.getSoDienThoai());
-        ps.setString(4, khachHang.getDiaChiKH());
-        if (khachHang.getNgaySinh() != null) {
-            ps.setDate(5, Date.valueOf(khachHang.getNgaySinh()));
-        } else {
-            ps.setNull(5, java.sql.Types.DATE);
-        }
-        ps.setString(6, khachHang.getGioiTinh());
+        // Không sử dụng nữa
     }
 }

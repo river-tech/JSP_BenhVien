@@ -48,19 +48,28 @@ public class VaccineDAOImpl implements VaccineDAO {
 
     @Override
     public boolean insert(Vaccine vaccine) {
+        // Insert không có ThoiGianCho vì cột này không có trong database
         String sql = "INSERT INTO VACXIN(MaVacxin, TenVacxin, SoMui, MoTa, GiaVacxin, TenHangSX) VALUES(?,?,?,?,?,?)";
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            fillStatement(vaccine, ps);
+            ps.setString(1, vaccine.getMaVacxin());
+            ps.setString(2, vaccine.getTenVacxin());
+            ps.setInt(3, vaccine.getSoMui());
+            ps.setString(4, vaccine.getMoTa());
+            ps.setInt(5, vaccine.getGiaVacxin());
+            ps.setString(6, vaccine.getTenHangSX());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("Lỗi SQL khi insert vaccine: " + e.getMessage());
+            System.err.println("SQL State: " + e.getSQLState());
         }
         return false;
     }
 
     @Override
     public boolean update(Vaccine vaccine) {
+        // Update không có ThoiGianCho vì cột này không có trong database
         String sql = "UPDATE VACXIN SET TenVacxin=?, SoMui=?, MoTa=?, GiaVacxin=?, TenHangSX=? WHERE MaVacxin=?";
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -125,6 +134,27 @@ public class VaccineDAOImpl implements VaccineDAO {
         return vaccines;
     }
 
+    @Override
+    public List<Vaccine> findByMaBenh(String maBenh) {
+        List<Vaccine> vaccines = new ArrayList<>();
+        String sql = "SELECT DISTINCT vc.MaVacxin, vc.TenVacxin, vc.SoMui, vc.MoTa, vc.GiaVacxin, vc.TenHangSX " +
+                "FROM VACXIN vc " +
+                "JOIN PHONGBENH pb ON vc.MaVacxin = pb.MaVacxin " +
+                "WHERE pb.MaBenh = ? " +
+                "ORDER BY vc.MaVacxin";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, maBenh);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                vaccines.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vaccines;
+    }
+
     private Vaccine mapRow(ResultSet rs) throws SQLException {
         return new Vaccine(
                 rs.getString("MaVacxin"),
@@ -136,12 +166,9 @@ public class VaccineDAOImpl implements VaccineDAO {
         );
     }
 
+    // Method này không còn được sử dụng, đã thay bằng code trực tiếp trong insert()
+    @Deprecated
     private void fillStatement(Vaccine vaccine, PreparedStatement ps) throws SQLException {
-        ps.setString(1, vaccine.getMaVacxin());
-        ps.setString(2, vaccine.getTenVacxin());
-        ps.setInt(3, vaccine.getSoMui());
-        ps.setString(4, vaccine.getMoTa());
-        ps.setInt(5, vaccine.getGiaVacxin());
-        ps.setString(6, vaccine.getTenHangSX());
+        // Không sử dụng nữa
     }
 }

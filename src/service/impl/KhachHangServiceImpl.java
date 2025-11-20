@@ -24,6 +24,11 @@ public class KhachHangServiceImpl implements KhachHangService {
     }
 
     @Override
+    public boolean create(KhachHang khachHang) {
+        return khachHangDAO.insert(khachHang);
+    }
+
+    @Override
     public List<ThongKeChiPhiView> getThongKeChiPhi() {
         return khachHangDAO.getThongKeChiPhi();
     }

@@ -5,7 +5,7 @@
 ## 1. Công nghệ và yêu cầu hệ thống
 
 - Java 8+
-- Apache Tomcat 10.1.x (port 8082)
+- Apache Tomcat 10.1.x (port 8080)
 - PostgreSQL (host `127.0.0.1`, port `9696`, db `benhvien_db`, user `admin`, password rỗng)
 - Maven 3.9+
 
@@ -14,8 +14,14 @@
 ```bash
 psql -h 127.0.0.1 -p 9696 -U admin -c "CREATE DATABASE benhvien_db;"
 psql -h 127.0.0.1 -p 9696 -d benhvien_db -U admin -f schema.sql   # nếu bạn đã có file schema từ bài lab
+psql -h 127.0.0.1 -p 9696 -d benhvien_db -U admin -f schema_update.sql  # Thêm cột ThoiGianCho vào VACXIN
 psql -h 127.0.0.1 -p 9696 -d benhvien_db -U admin -f sample_data.sql
 ```
+
+**Thông tin đăng nhập Admin:**
+- Username: `admin`
+- Password: `admin`
+- ⚠️ **Lưu ý:** Tài khoản admin được hardcode trong code, không lưu trong database
 
 > `sample_data.sql` trong repo đã chuẩn bị sẵn 5 khách hàng, 5 bệnh, 10 vaccine và 10 bản ghi lịch sử.
 
@@ -33,7 +39,7 @@ pg_dump -h 127.0.0.1 -p 9696 -U admin -d benhvien_db -f Test999.sql
 4. Mở `TOMCAT_HOME/conf/server.xml`, chỉnh Connector chính sang `port="8082"`
 5. Khởi động Tomcat: `bin/startup.sh` hoặc từ IDE
 
-Ứng dụng khả dụng tại: `http://localhost:8082/benhvien-web`
+Ứng dụng khả dụng tại: `http://localhost:8080/benhvien-web`
 
 ## 4. Import vào IntelliJ IDEA / Eclipse
 
@@ -82,7 +88,7 @@ sequenceDiagram
 
 ## 7. Hướng dẫn sử dụng nhanh
 
-1. Truy cập `http://localhost:8082/benhvien-web` (tự chuyển đến trang vaccine)
+1. Truy cập `http://localhost:8080/benhvien-web` (tự chuyển đến trang vaccine)
 2. Tab Vaccine: thêm mới, tìm kiếm theo mã/tên/hãng, sửa, xóa
 3. Trang "Lịch sử tiêm": hiển thị join 4 bảng theo yêu cầu đề bài
 4. Trang "Thống kê": tính `SUM(GiaVacxin)` theo khách hàng, sắp xếp tăng dần

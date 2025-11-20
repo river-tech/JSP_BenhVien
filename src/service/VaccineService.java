@@ -17,4 +17,6 @@ public interface VaccineService {
     boolean delete(String maVacxin);
 
     List<Vaccine> search(String maVacxin, String tenVacxin, String tenHangSX);
+    
+    List<Vaccine> getByMaBenh(String maBenh);
 }

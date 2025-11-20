@@ -31,4 +31,48 @@ public class PhongBenhDAOImpl implements PhongBenhDAO {
         }
         return list;
     }
+
+    @Override
+    public boolean exists(String maVacxin, String maBenh) {
+        String sql = "SELECT 1 FROM PHONGBENH WHERE MaVacxin = ? AND MaBenh = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, maVacxin);
+            ps.setString(2, maBenh);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean insert(PhongBenh phongBenh) {
+        String sql = "INSERT INTO PHONGBENH(MaVacxin, MaBenh, GhiChu) VALUES(?,?,?) ON CONFLICT (MaVacxin, MaBenh) DO NOTHING";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, phongBenh.getMaVacxin());
+            ps.setString(2, phongBenh.getMaBenh());
+            ps.setString(3, phongBenh.getGhiChu());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            // Nếu PostgreSQL không hỗ trợ ON CONFLICT, thử cách khác
+            try {
+                String sql2 = "INSERT INTO PHONGBENH(MaVacxin, MaBenh, GhiChu) SELECT ?,?,? WHERE NOT EXISTS (SELECT 1 FROM PHONGBENH WHERE MaVacxin = ? AND MaBenh = ?)";
+                try (Connection conn = DBConnect.getConnection();
+                     PreparedStatement ps = conn.prepareStatement(sql2)) {
+                    ps.setString(1, phongBenh.getMaVacxin());
+                    ps.setString(2, phongBenh.getMaBenh());
+                    ps.setString(3, phongBenh.getGhiChu());
+                    ps.setString(4, phongBenh.getMaVacxin());
+                    ps.setString(5, phongBenh.getMaBenh());
+                    return ps.executeUpdate() > 0;
+                }
+            } catch (SQLException e2) {
+                e2.printStackTrace();
+            }
+        }
+        return false;
+    }
 }

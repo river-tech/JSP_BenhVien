@@ -41,4 +41,9 @@ public class VaccineServiceImpl implements VaccineService {
     public List<Vaccine> search(String maVacxin, String tenVacxin, String tenHangSX) {
         return vaccineDAO.search(maVacxin, tenVacxin, tenHangSX);
     }
+
+    @Override
+    public List<Vaccine> getByMaBenh(String maBenh) {
+        return vaccineDAO.findByMaBenh(maBenh);
+    }
 }

@@ -66,14 +66,64 @@ public class LSTiemPhongDAOImpl implements LSTiemPhongDAO {
     }
 
     @Override
+    public List<LichSuTiemPhong> findByMaKH(String maKH) {
+        List<LichSuTiemPhong> list = new ArrayList<>();
+        String sql = "SELECT MaKH, MaVacxin, STTMui, NgayTiemPhong, NgayHenTiepTheo FROM LICHSUTIEMPHONG WHERE MaKH = ? ORDER BY MaVacxin, STTMui";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, maKH);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Date ngayTiem = rs.getDate("NgayTiemPhong");
+                Date ngayHen = rs.getDate("NgayHenTiepTheo");
+                list.add(new LichSuTiemPhong(
+                        rs.getString("MaKH"),
+                        rs.getString("MaVacxin"),
+                        rs.getInt("STTMui"),
+                        ngayTiem != null ? ngayTiem.toLocalDate() : null,
+                        ngayHen != null ? ngayHen.toLocalDate() : null
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public String getVaccineUsedForDisease(String maKH, String maBenh) {
+        // Kiểm tra xem khách hàng đã tiêm vaccine nào cho bệnh này chưa
+        String sql = "SELECT DISTINCT ls.MaVacxin " +
+                "FROM LICHSUTIEMPHONG ls " +
+                "JOIN PHONGBENH pb ON ls.MaVacxin = pb.MaVacxin " +
+                "WHERE ls.MaKH = ? AND pb.MaBenh = ? " +
+                "LIMIT 1";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, maKH);
+            ps.setString(2, maBenh);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("MaVacxin");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public List<LichSuTiemPhongView> findHistoryView() {
         List<LichSuTiemPhongView> list = new ArrayList<>();
-        String sql = "SELECT kh.MaKH, kh.HoTenKH, b.TenBenh, vc.MaVacxin, vc.TenVacxin, vc.SoMui " +
+        // Dùng LEFT JOIN để hiển thị cả khi chưa có PHONGBENH
+        // Nếu có nhiều bệnh cho 1 vaccine, sẽ hiển thị nhiều dòng
+        String sql = "SELECT DISTINCT kh.MaKH, kh.HoTenKH, COALESCE(b.TenBenh, 'Chưa xác định') AS TenBenh, " +
+                "vc.MaVacxin, vc.TenVacxin, vc.SoMui " +
                 "FROM KHACHHANG kh " +
                 "JOIN LICHSUTIEMPHONG ls ON kh.MaKH = ls.MaKH " +
                 "JOIN VACXIN vc ON ls.MaVacxin = vc.MaVacxin " +
-                "JOIN PHONGBENH pb ON vc.MaVacxin = pb.MaVacxin " +
-                "JOIN BENH b ON pb.MaBenh = b.MaBenh " +
+                "LEFT JOIN PHONGBENH pb ON vc.MaVacxin = pb.MaVacxin " +
+                "LEFT JOIN BENH b ON pb.MaBenh = b.MaBenh " +
                 "ORDER BY kh.MaKH, vc.MaVacxin";
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -90,6 +140,7 @@ public class LSTiemPhongDAOImpl implements LSTiemPhongDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("Lỗi khi query lịch sử tiêm phòng: " + e.getMessage());
         }
         return list;
     }

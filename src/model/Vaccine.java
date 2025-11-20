@@ -7,6 +7,7 @@ public class Vaccine {
     private String moTa;
     private int giaVacxin;
     private String tenHangSX;
+    private int thoiGianCho; // Số ngày chờ giữa các mũi tiêm
 
     public Vaccine() {
     }
@@ -66,5 +67,13 @@ public class Vaccine {
 
     public void setTenHangSX(String tenHangSX) {
         this.tenHangSX = tenHangSX;
+    }
+
+    public int getThoiGianCho() {
+        return thoiGianCho;
+    }
+
+    public void setThoiGianCho(int thoiGianCho) {
+        this.thoiGianCho = thoiGianCho;
     }
 }

@@ -15,4 +15,9 @@ public class PhongBenhServiceImpl implements PhongBenhService {
     public List<PhongBenh> getAll() {
         return phongBenhDAO.findAll();
     }
+
+    @Override
+    public boolean create(PhongBenh phongBenh) {
+        return phongBenhDAO.insert(phongBenh);
+    }
 }

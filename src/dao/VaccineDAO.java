@@ -17,4 +17,7 @@ public interface VaccineDAO {
     boolean delete(String maVacxin);
 
     List<Vaccine> search(String maVacxin, String tenVacxin, String tenHangSX);
+    
+    // Lấy danh sách vaccine có thể phòng được bệnh này
+    List<Vaccine> findByMaBenh(String maBenh);
 }
