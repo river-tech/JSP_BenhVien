@@ -33,11 +33,11 @@
             <input type="hidden" name="type" value="admin">
             <div class="form-group">
                 <label for="username">Tên đăng nhập</label>
-                <input type="text" id="username" name="username" placeholder="admin" required>
+                <input type="text" id="username" name="username" required>
             </div>
             <div class="form-group">
                 <label for="password">Mật khẩu</label>
-                <input type="password" id="password" name="password" placeholder="admin" required>
+                <input type="password" id="password" name="password" required>
             </div>
             <button type="submit" style="width: 100%;">Đăng nhập</button>
         </form>
